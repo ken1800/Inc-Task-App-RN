@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Text, TextInput } from "react-native-paper";
 import { View, ScrollView, StyleSheet } from "react-native";
-import { Formik, FormikHelpers, FormikProps } from "formik";
+import { Formik, FormikHelpers } from "formik";
 
 import { todoValidationSchema } from "../validations";
 import { useTodoContext } from "../context/TodoContext";
@@ -18,14 +18,18 @@ const AddTodoScreen = () => {
 
   const handleSubmit = (values: FormValues, { resetForm }: FormikHelpers<FormValues>) => {
     addTodo({
-        id: new Date().getTime(),
-        text: values.text,
-        description: values.description,
-        completed: false,
+      id: new Date().getTime(),
+      text: values.text,
+      description: values.description,
+      completed: false,
     })
     shortToastMessage(`Task ${values.text} added successfully`)
     resetForm()
   };
+
+  const fieldsEmpty = (values: FormValues) => {
+    return !values.text || !values.description
+  }
 
   return (
     <View style={{ flex:1, backgroundColor:'white', justifyContent:'center' }}>
@@ -35,47 +39,50 @@ const AddTodoScreen = () => {
           validationSchema={todoValidationSchema}
           onSubmit={handleSubmit}
         >
-          {(formikProps: FormikProps<FormValues>) => (
+          {({ values, submitForm, errors, handleChange, touched, handleBlur, isSubmitting, isValid, dirty }) => (
             <View>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Task Title</Text>
                 <TextInput
+                  testID="taskTitle"
                   label='Task Title'
-                  value={formikProps.values.text}
+                  value={values.text}
                   mode="outlined"
                   multiline={true}
                   activeOutlineColor={palette.defaultTheme}
-                  onChangeText={formikProps.handleChange("text")}
-                  onBlur={formikProps.handleBlur("text")}
+                  onChangeText={handleChange("text")}
+                  onBlur={handleBlur("text")}
                 />
-                {formikProps.errors.text && formikProps.touched.text && (
-                  <Text style={styles.error}>{formikProps.errors.text}</Text>
-                )}
+                  {errors.text && touched.text && (
+                    <Text style={styles.error}>{errors.text}</Text>
+                  )}
               </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Task Description</Text>
                 <TextInput
-                  value={formikProps.values.description}
+                  testID="taskDescription"
+                  value={values.description}
                   mode="outlined"
                   placeholder="Add a description for the task"
                   multiline={true}
                   activeOutlineColor={palette.defaultTheme}
-                  onChangeText={formikProps.handleChange("description")}
-                  onBlur={formikProps.handleBlur("description")}
+                  onChangeText={handleChange("description")}
+                  onBlur={handleBlur("description")}
                   style={styles.descriptionInput}
                 />
-                {formikProps.errors.description && formikProps.touched.description && (
-                  <Text style={styles.error}>{formikProps.errors.description}</Text>
-                )}
+                  {errors.description && touched.description && (
+                    <Text style={styles.error}>{errors.description}</Text>
+                  )}
               </View>
 
               <View style={styles.buttonContainer}>
                 <Button
+                  testID="addTaskButton"
                   mode="contained"
-                  onPress={() => formikProps.handleSubmit()}
+                  onPress={submitForm}
                   style={styles.addButton}
                   icon="plus"
-                  disabled={!formikProps.isValid || formikProps.isSubmitting}
+                  disabled={!isValid || isSubmitting || !dirty || fieldsEmpty(values)}
                 >
                   Add Task
                 </Button>

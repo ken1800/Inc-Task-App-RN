@@ -1,11 +1,11 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { FAB, Text } from 'react-native-paper'
+import { NavigationProp } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import palette from '../../palette'
 import TodoList from '../components/TodoList'
-import { NavigationProp } from '@react-navigation/native'
 
 interface Props {
   navigation: NavigationProp<any>
